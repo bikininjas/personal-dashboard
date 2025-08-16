@@ -1,0 +1,12 @@
+entryPoints:
+  web:
+    address: ":80"
+  websecure:
+    address: ":443"
+certificatesResolvers:
+  letsencrypt:
+    acme:
+      email: your@email.com
+      storage: acme.json
+      httpChallenge:
+        entryPoint: web

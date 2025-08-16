@@ -1,0 +1,3 @@
+__backup__/
+.env
+traefik/acme.json
