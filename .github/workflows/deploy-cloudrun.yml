@@ -44,5 +44,5 @@ jobs:
             VIKUNJA_DATABASE_TYPE=postgres
             VIKUNJA_DATABASE_HOST=${{ secrets.PG_VIKUNJA_IP }}
             VIKUNJA_DATABASE_USER=${{ secrets.PG_VIKUNJA_USER }}
-            VIKUNJA_DATABASE_PASSWORD=${{ secrets.PG_VIKUNJA_PASSWORD }}
+            VIKUNJA_DATABASE_PASSWORD='${{ secrets.PG_VIKUNJA_PASSWORD }}'
             VIKUNJA_DATABASE_DATABASE=${{ secrets.PG_VIKUNJA_DATABASE }}
