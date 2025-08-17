@@ -22,7 +22,7 @@ jobs:
       - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v2
         with:
-          credentials_json: ${{ secrets.GCP_SA_KEY }}
+          credentials_json: ${{ secrets.GCS_GH_SVC_ACCOUNT_JSON_KEY }}
 
       - name: Configure Docker for Google Artifact Registry
         run: |
@@ -41,7 +41,7 @@ jobs:
           region: ${{ env.REGION }}
           env_vars: |
             VIKUNJA_DATABASE_TYPE=postgres
-            VIKUNJA_DATABASE_HOST=${{ secrets.PG_HOST }}
-            VIKUNJA_DATABASE_USER=${{ secrets.PG_USER }}
-            VIKUNJA_DATABASE_PASSWORD=${{ secrets.PG_PASSWORD }}
-            VIKUNJA_DATABASE_DATABASE=${{ secrets.PG_DATABASE }}
+            VIKUNJA_DATABASE_HOST=${{ secrets.PG_VIKUNJA_IP }}
+            VIKUNJA_DATABASE_USER=${{ secrets.PG_VIKUNJA_USER }}
+            VIKUNJA_DATABASE_PASSWORD=${{ secrets.PG_VIKUNJA_PASSWORD }}
+            VIKUNJA_DATABASE_DATABASE=${{ secrets.PG_VIKUNJA_DATABASE }}

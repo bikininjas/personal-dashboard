@@ -106,10 +106,11 @@ Open a pull request to merge into `master` when ready.
 10. Note the public IP address of your instance.
 
 **Use these values for your GitHub Actions secrets:**
-- `PG_HOST`: The public IP address of your Cloud SQL instance
-- `PG_USER`: The database user you created (e.g., `vikunja`)
-- `PG_PASSWORD`: The password you set
-- `PG_DATABASE`: The database name you created (e.g., `vikunja`)
+
+- `PG_VIKUNJA_IP`: The public IP address of your Cloud SQL instance
+- `PG_VIKUNJA_USER`: The database user you created (e.g., `vikunja`)
+- `PG_VIKUNJA_PASSWORD`: The password you set
+- `PG_VIKUNJA_DATABASE`: The database name you created (e.g., `vikunja`)
 
 **Security tip:** For production, restrict authorized networks to only your Cloud Run service or use the Cloud SQL Auth Proxy for secure connections.
 
