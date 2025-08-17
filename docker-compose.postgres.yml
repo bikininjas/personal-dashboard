@@ -1,0 +1,40 @@
+version: '3.7'
+services:
+  vikunja:
+    image: vikunja/vikunja
+    env_file:
+      - .env
+    ports:
+      - "3456:3456"
+    restart: unless-stopped
+    # Pour utiliser la base distante, commentez la ligne suivante :
+    # depends_on:
+    #   - postgres
+    depends_on:
+      - proxy
+    # Pour tests locaux, décommentez le service postgres ci-dessous et adaptez le .env
+  # postgres:
+  #   image: postgres:16
+  #   environment:
+  #     POSTGRES_DB: vikunja
+  #     POSTGRES_USER: vikunja
+  #     POSTGRES_PASSWORD: yourpassword
+  #   volumes:
+  #     - postgres_data:/var/lib/postgresql/data
+  #   restart: unless-stopped
+  proxy:
+    image: traefik:v2.10
+    command:
+      - --api.insecure=true
+      - --providers.docker=true
+      - --entrypoints.web.address=:80
+      - --entrypoints.websecure.address=:443
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./traefik/traefik.yml:/traefik.yml
+      - ./traefik/acme.json:/acme.json
+volumes:
+  postgres_data:
