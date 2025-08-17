@@ -1,5 +1,4 @@
 # Dockerfile for Vikunja (Cloud Run)
 FROM vikunja/vikunja:latest
-# Configure Vikunja to listen on the port provided by Cloud Run
-ENV VIKUNJA_SERVICE_PORT=${PORT}
+ENV VIKUNJA_SERVICE_PORT=8080
 EXPOSE 8080
