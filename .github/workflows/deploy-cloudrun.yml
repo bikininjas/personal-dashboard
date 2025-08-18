@@ -41,6 +41,17 @@ jobs:
             --platform managed \
             --quiet || true
 
+      - name: Remove old VIKUNJA_DATABASE_PASSWORD env var if exists
+        run: |
+          gcloud run services update ${{ env.SERVICE }} \
+            --region ${{ env.REGION }} \
+            --remove-env-vars VIKUNJA_DATABASE_PASSWORD \
+            --platform managed \
+            --quiet || true
+
+      - name: Wait for env var removal to propagate
+        run: sleep 10
+
       - name: Mask DB password in logs
         run: echo "::add-mask::${{ secrets.PG_VIKUNJA_PASSWORD }}"
 
