@@ -32,22 +32,22 @@ jobs:
           docker build -t europe-west9-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${{ secrets.PG_VIKUNJA_USER }}/vikunja:latest .
           docker push europe-west9-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${{ secrets.PG_VIKUNJA_USER }}/vikunja:latest
 
-      - name: Ensure Cloud Run service exists
-        run: |
-          gcloud run deploy ${{ env.SERVICE }} \
-            --image europe-west9-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.SERVICE }}/vikunja:latest \
-            --region ${{ env.REGION }} \
-            --no-traffic \
-            --platform managed \
-            --quiet || true
+      # - name: Ensure Cloud Run service exists
+      #   run: |
+      #     gcloud run deploy ${{ env.SERVICE }} \
+      #       --image europe-west9-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.SERVICE }}/vikunja:latest \
+      #       --region ${{ env.REGION }} \
+      #       --no-traffic \
+      #       --platform managed \
+      #       --quiet || true
 
-      - name: Remove old VIKUNJA_DATABASE_PASSWORD env var if exists
-        run: |
-          gcloud run services update ${{ env.SERVICE }} \
-            --region ${{ env.REGION }} \
-            --remove-env-vars VIKUNJA_DATABASE_PASSWORD \
-            --platform managed \
-            --quiet || true
+      # - name: Remove old VIKUNJA_DATABASE_PASSWORD env var if exists
+      #   run: |
+      #     gcloud run services update ${{ env.SERVICE }} \
+      #       --region ${{ env.REGION }} \
+      #       --remove-env-vars VIKUNJA_DATABASE_PASSWORD \
+      #       --platform managed \
+      #       --quiet || true
 
       - name: Wait for env var removal to propagate
         run: sleep 10
@@ -62,6 +62,9 @@ jobs:
           image: europe-west9-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${{ vars.GCR_SERVICE }}/vikunja:latest
           region: ${{ env.REGION }}
           timeout: 300s
+          flags: |
+            --port=3456
+            --liveness-probe=timeoutSeconds=30,httpGet.port=3456
           env_vars: |
             VIKUNJA_SERVICE_PORT=3456
             VIKUNJA_DATABASE_TYPE=postgres
