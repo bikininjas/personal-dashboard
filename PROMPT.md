@@ -147,7 +147,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
-      REGION: europe-west1
+  REGION: europe-west9
       SERVICE: vikunja
     steps:
       - name: Checkout code
@@ -163,18 +163,18 @@ jobs:
 
       - name: Configure Docker for Google Artifact Registry
         run: |
-          gcloud auth configure-docker europe-west1-docker.pkg.dev
+          gcloud auth configure-docker europe-west9-docker.pkg.dev
 
       - name: Build and push Docker image
         run: |
-          docker build -t europe-west1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/vikunja/vikunja:latest .
-          docker push europe-west1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/vikunja/vikunja:latest
+          docker build -t europe-west9-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/vikunja/vikunja:latest .
+          docker push europe-west9-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/vikunja/vikunja:latest
 
       - name: Deploy to Cloud Run
         uses: google-github-actions/deploy-cloudrun@v2
         with:
           service: ${{ env.SERVICE }}
-          image: europe-west1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/vikunja/vikunja:latest
+          image: europe-west9-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/vikunja/vikunja:latest
           region: ${{ env.REGION }}
           env_vars: |
             VIKUNJA_SERVICE_PORT=8080
