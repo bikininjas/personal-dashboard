@@ -61,6 +61,7 @@ jobs:
           service: ${{ env.SERVICE }}
           image: europe-west9-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${{ secrets.PG_VIKUNJA_USER }}/vikunja:latest
           region: ${{ env.REGION }}
+          timeout: 300s
           env_vars: |
             VIKUNJA_SERVICE_PORT=3456
             VIKUNJA_DATABASE_TYPE=postgres
