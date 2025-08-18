@@ -59,7 +59,7 @@ jobs:
         uses: google-github-actions/deploy-cloudrun@v2
         with:
           service: ${{ env.SERVICE }}
-          image: europe-west9-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${{ secrets.PG_VIKUNJA_USER }}/vikunja:latest
+          image: europe-west9-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${{ vars.GCR_SERVICE }}/vikunja:latest
           region: ${{ env.REGION }}
           timeout: 300s
           env_vars: |
