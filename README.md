@@ -7,22 +7,17 @@ This project provides a portable, secure, and easy-to-maintain Docker setup for 
 ## Features
 
 - **Vikunja API** deployed via official Docker image
-- **Database options:**
+
   - Remote SQLite Cloud (experimental, not recommended for production)
   - PostgreSQL (recommended)
 - **Reverse Proxy:** Traefik (recommended) or Nginx for HTTPS
 - **Automated backup scripts** for both database types
-- **Environment variable and secrets management**
 - **Generic Docker host compatibility**
 
 ---
 
-## Quick Start
-
-1. **Clone the repository**
-2. **Configure your `.env` file** (see below)
-3. **Choose your database backend**
-4. **Launch with Docker Compose**
+1. **Choose your database backend**
+2. **Launch with Docker Compose**
 
     ```bash
     # For SQLite Cloud
@@ -51,24 +46,16 @@ VIKUNJA_DATABASE_HOST=postgres
 VIKUNJA_DATABASE_USER=vikunja
 VIKUNJA_DATABASE_PASSWORD=yourpassword
 VIKUNJA_DATABASE_DATABASE=vikunja
-```
 
 ---
 
 ## Docker Compose Examples
 
-See `PROMPT.md` for full examples for both database setups.
 
 ---
 
-## HTTPS Setup
 
 - Traefik is pre-configured for Let's Encrypt certificates.
-- Edit `traefik.yml` and `acme.json` as needed for your domain.
-
----
-
-## Backup & Restore
 
 - **SQLite Cloud:** Use provider API/CLI for regular exports. Automate with scripts in `__backup__` (add to `.gitignore`).
 - **PostgreSQL:** Use `pg_dump` in a cron job. Store backups securely and automate retention.

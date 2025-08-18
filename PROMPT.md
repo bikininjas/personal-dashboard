@@ -1,22 +1,15 @@
 # Vikunja Deployment Guide with Docker and PostgreSQL
 
-**Personna:**
 You are a DevOps engineer specializing in self-hosted application deployment, Docker containerization, and best practices for security and reliability.
 **Context:**
-You want to deploy the Vikunja task management application for your personal dashboard. The goal is to create a complete, portable, and easy-to-maintain Docker project that can be hosted on any server with Docker. The recommended and supported database is PostgreSQL.
-
----
+You want to deploy the Vikunja task management application for your personal dashboard. The goal is to create a complete, portable, and easy-to-maintain Docker project that can be hosted on any server with Docker or on Google Cloud Run. The only recommended and supported database is PostgreSQL.
 
 ## 1. Prerequisites
 
 - Docker & Docker Compose installed
-- PostgreSQL credentials
-- Basic knowledge of Docker networking
-- HTTPS domain and DNS setup for reverse proxy
-
 Additional requirements:
 
-- Reverse proxy (Traefik or Nginx) for HTTPS is required.
+- Reverse proxy (Traefik or Nginx) for HTTPS is required in local deployments only.
 - Automated backup scripts must be included.
 - Deployment instructions should be generic for any Docker host.
 - Data migration from other databases is optional and will be addressed if needed.
@@ -34,6 +27,9 @@ Additional requirements:
     - [Exemple](#exemple)
   - [Reverse Proxy Setup (HTTPS)](#reverse-proxy-setup-https)
   - [Docker Compose Example](#docker-compose-example)
+  - [CI/CD for Google Cloud Run](#cicd-for-google-cloud-run)
+    - [GitHub Actions Workflow Example](#github-actions-workflow-example)
+    - [Best Practices for CI/CD](#best-practices-for-cicd)
 
 ---
 
@@ -58,19 +54,15 @@ Additional requirements:
 
 ## Reverse Proxy Setup (HTTPS)
 
-Use Traefik (recommended) or Nginx for HTTPS termination. Example Traefik config:
-
 ```yaml
-# traefik.yml
-entryPoints:
-  web:
-    address: ":80"
-  websecure:
-    address: ":443"
+web:
+  address: ":80"
+websecure:
+  address: ":443"
 certificatesResolvers:
   letsencrypt:
     acme:
-      email: sebpicot@gmail.com
+      email: <sebpicot@gmail.com>
       storage: acme.json
       httpChallenge:
         entryPoint: web
@@ -111,7 +103,6 @@ services:
       - --entrypoints.web.address=:80
       - --entrypoints.websecure.address=:443
     ports:
-      - "80:80"
       - "443:443"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
@@ -120,8 +111,6 @@ services:
 volumes:
   postgres_data:
 ```
-
-Example `.env` for PostgreSQL:
 
 ```env
 VIKUNJA_DATABASE_TYPE=postgres
@@ -136,3 +125,73 @@ VIKUNJA_DATABASE_DATABASE=vikunja
 - Never commit `.env` files to git.
 - Use strong, unique passwords.
 - Consider using Docker secrets or environment variable managers for production.
+
+---
+
+## CI/CD for Google Cloud Run
+
+### GitHub Actions Workflow Example
+
+Automate build, push, and deploy to Cloud Run with secrets:
+
+```yaml
+name: Deploy Vikunja to Google Cloud Run
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    env:
+      PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+      REGION: europe-west1
+      SERVICE: vikunja
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCS_GH_SVC_ACCOUNT_JSON_KEY }}
+
+      - name: Configure Docker for Google Artifact Registry
+        run: |
+          gcloud auth configure-docker europe-west1-docker.pkg.dev
+
+      - name: Build and push Docker image
+        run: |
+          docker build -t europe-west1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/vikunja/vikunja:latest .
+          docker push europe-west1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/vikunja/vikunja:latest
+
+      - name: Deploy to Cloud Run
+        uses: google-github-actions/deploy-cloudrun@v2
+        with:
+          service: ${{ env.SERVICE }}
+          image: europe-west1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/vikunja/vikunja:latest
+          region: ${{ env.REGION }}
+          env_vars: |
+            VIKUNJA_SERVICE_PORT=8080
+            VIKUNJA_DATABASE_TYPE=postgres
+            VIKUNJA_DATABASE_HOST=${{ secrets.PG_VIKUNJA_IP }}
+            VIKUNJA_DATABASE_USER=${{ secrets.PG_VIKUNJA_USER }}
+            VIKUNJA_DATABASE_DATABASE=${{ secrets.PG_VIKUNJA_DATABASE }}
+            VIKUNJA_DATABASE_PASSWORD=VIKUNJA_DATABASE_PASSWORD
+          secrets: |
+            VIKUNJA_DATABASE_PASSWORD=vikunja-db-password:latest
+```
+
+### Best Practices for CI/CD
+
+- Never commit secrets or `.env` files to git
+- Use GitHub Secrets and Google Secret Manager for sensitive data
+- Mask secrets in logs (`::add-mask::`)
+- Clean up workflow runs to remove sensitive logs
+- Automate rollback and error notifications
+- Monitor deployment status and logs after each run
