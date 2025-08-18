@@ -65,6 +65,7 @@ jobs:
           flags: |
             --port=3456
             --liveness-probe=timeoutSeconds=10,httpGet.port=3456
+            --startup-probe=timeoutSeconds=10,httpGet.port=3456
           env_vars: |
             VIKUNJA_SERVICE_PORT=3456
             VIKUNJA_DATABASE_TYPE=postgres
