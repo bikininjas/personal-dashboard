@@ -50,4 +50,4 @@ jobs:
             VIKUNJA_DATABASE_PASSWORD=VIKUNJA_DATABASE_PASSWORD
             VIKUNJA_DATABASE_DATABASE=${{ secrets.PG_VIKUNJA_DATABASE }}
           secrets: |
-            VIKUNJA_DATABASE_PASSWORD=projects/${{ secrets.GCP_PROJECT_ID }}/secrets/vikunja-db-password:latest
+            VIKUNJA_DATABASE_PASSWORD=vikunja-db-password:latest
