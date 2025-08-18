@@ -1,4 +1,4 @@
 # Dockerfile for Vikunja (Cloud Run)
 FROM vikunja/vikunja:latest
-ENV VIKUNJA_SERVICE_PORT=8080
-EXPOSE 8080
+ENV VIKUNJA_SERVICE_PORT=3456
+EXPOSE 3456
